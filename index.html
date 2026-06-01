@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM SkyBud — B2B Wärmepumpe Рекламация</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.97);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+        }
+        h1 { text-align: center; color: #1a1a2e; margin-bottom: 8px; font-size: 2.4em; font-weight: 700; }
+        .subtitle { text-align: center; color: #64748b; margin-bottom: 8px; font-size: 1.1em; }
+        .version { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; }
+
+        .funnel-container { overflow-x: auto; padding: 20px 0; }
+        .funnel { display: flex; flex-direction: column; gap: 30px; padding: 10px; }
+        .stage-section { display: flex; flex-direction: column; gap: 15px; }
+
+        .section-header { display: flex; align-items: center; gap: 15px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }
+        .section-title { font-size: 1.2em; font-weight: bold; color: white; padding: 10px 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .section-reklamation { background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%); }
+
+        .section-subtitle { color: #64748b; font-size: 0.95em; }
+        .section-description { background: #f8fafc; padding: 12px 16px; border-radius: 10px; font-size: 0.85em; color: #475569; border-left: 4px solid #fc4a1a; margin-top: 5px; }
+
+        .stages-flow { display: flex; gap: 15px; overflow-x: auto; padding: 15px 5px; align-items: flex-start; }
+
+        .stage-card { background: white; border-radius: 12px; min-width: 320px; max-width: 350px; border: 2px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s ease; flex-shrink: 0; }
+        .stage-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .stage-card.reklamation-card:hover { border-color: #fc4a1a; }
+
+        .card-header { padding: 12px 15px; border-radius: 10px 10px 0 0; display: flex; align-items: center; gap: 12px; }
+        .reklamation-card .card-header { background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%); }
+
+        .card-id { background: rgba(255,255,255,0.25); color: white; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 0.9em; }
+        .card-title { color: white; font-weight: 600; font-size: 1em; }
+        .card-body { padding: 15px; }
+
+        .owner-section { margin-bottom: 12px; }
+        .owner-label { font-size: 0.75em; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .owner-name { font-weight: 600; color: #1e293b; font-size: 0.95em; }
+
+        .role-section { margin-bottom: 12px; padding: 10px; background: #f8fafc; border-radius: 8px; border-left: 3px solid; }
+        .role-section.role-b2b { border-left-color: #3b82f6; }
+        .role-section.role-montageleiter { border-left-color: #f59e0b; }
+        .role-section.role-client { border-left-color: #06b6d4; }
+        .role-section.role-crm { border-left-color: #6366f1; }
+
+        .role-title { font-size: 0.8em; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .role-title.role-b2b { color: #3b82f6; }
+        .role-title.role-montageleiter { color: #f59e0b; }
+        .role-title.role-client { color: #06b6d4; }
+        .role-title.role-crm { color: #6366f1; }
+
+        .role-actions { list-style: none; padding: 0; margin: 0; }
+        .role-actions li { font-size: 0.8em; color: #475569; padding: 3px 0; padding-left: 16px; position: relative; line-height: 1.4; }
+        .role-actions li::before { content: '•'; position: absolute; left: 4px; color: #94a3b8; }
+
+        .checklist-section { margin-top: 10px; padding: 10px; background: #f0fdf4; border-radius: 8px; border: 1px solid #86efac; }
+        .checklist-title { font-size: 0.75em; font-weight: 600; color: #15803d; margin-bottom: 6px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+        .checklist-group-label { font-size: 0.72em; font-weight: 600; color: #6b7280; margin: 6px 0 3px 0; text-transform: uppercase; letter-spacing: 0.3px; }
+        .checklist-list { list-style: none; padding: 0; margin: 0; }
+        .checklist-list li { font-size: 0.78em; color: #374151; padding: 3px 0; padding-left: 22px; position: relative; line-height: 1.4; }
+        .checklist-list li::before { content: '☐'; position: absolute; left: 2px; color: #6b7280; font-size: 1em; }
+
+        .criteria-section { margin-top: 12px; padding: 10px; background: #fefce8; border-radius: 8px; border: 1px dashed #eab308; }
+        .criteria-title { font-size: 0.75em; font-weight: 600; color: #a16207; margin-bottom: 6px; text-transform: uppercase; }
+        .criteria-list { list-style: none; padding: 0; margin: 0; }
+        .criteria-list li { font-size: 0.78em; color: #713f12; padding: 2px 0; padding-left: 18px; position: relative; }
+        .criteria-list li::before { content: '✓'; position: absolute; left: 2px; color: #16a34a; font-weight: bold; }
+
+        .comment-section { margin-top: 10px; padding: 10px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 8px; border: 1px solid #f59e0b; }
+        .comment-title { font-size: 0.75em; font-weight: 600; color: #92400e; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+        .comment-text { font-size: 0.78em; color: #78350f; line-height: 1.4; }
+
+        .next-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.78em; color: #64748b; }
+        .next-section strong { color: #1e293b; }
+
+        .flow-arrow { display: flex; align-items: center; justify-content: center; color: #cbd5e0; font-size: 1.8em; padding: 0 5px; flex-shrink: 0; align-self: center; }
+
+        .transition-block { display: flex; align-items: center; justify-content: center; padding: 8px 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 10px; border: 2px dashed #f59e0b; flex-shrink: 0; align-self: center; }
+        .transition-text { font-size: 0.85em; color: #92400e; font-weight: bold; margin-right: 8px; }
+        .transition-icon { font-size: 1.3em; color: #f59e0b; }
+
+        .info-box { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 16px; padding: 25px; margin-top: 30px; display: flex; gap: 20px; justify-content: space-around; flex-wrap: wrap; border: 1px solid #e2e8f0; }
+        .info-item { text-align: center; padding: 15px 25px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .info-number { font-size: 2.2em; font-weight: bold; }
+        .info-number.rekl-num { color: #fc4a1a; }
+        .info-number.total-num { background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .info-label { font-size: 0.85em; color: #64748b; margin-top: 5px; font-weight: 500; }
+
+        .legend { display: flex; gap: 25px; justify-content: center; margin-top: 25px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.9em; color: #475569; }
+        .legend-color { width: 18px; height: 18px; border-radius: 5px; }
+        .legend-reklamation { background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%); }
+
+        @media (max-width: 768px) { h1 { font-size: 1.6em; } .stage-card { min-width: 280px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔧 CRM SkyBud: B2B Wärmepumpe Рекламация</h1>
+    <p class="subtitle">Eingang → Analyse → Terminvereinbarung → Behebung → Abschluss | Полный цикл обработки рекламации</p>
+    <p class="version">v1.0 — B2B Wärmepumpe Рекламация Funnel Playbook SKYBUD</p>
+
+    <div class="funnel-container">
+        <div class="funnel" id="funnel"></div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="legend-color legend-reklamation"></div><span>Рекламация (R) — Warranty Claims / Beschwerdemanagement</span></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-item"><div class="info-number rekl-num">5</div><div class="info-label">Этапов РЕКЛАМАЦИЯ (R)</div></div>
+        <div class="info-item"><div class="info-number total-num">5</div><div class="info-label">Всего этапов</div></div>
+    </div>
+</div>
+
+<script>
+const data = {
+    reklamation: {
+        title: "СТАДИЯ: РЕКЛАМАЦИЯ — R",
+        subtitle: "Warranty Claims / Beschwerdemanagement",
+        sectionClass: "section-reklamation",
+        cardClass: "reklamation-card",
+        description: "Стадия описывает полный цикл обработки рекламации: от получения заявки клиента до устранения проблемы и закрытия карточки.",
+        stages: [
+            {
+                id: "R1", title: "Новая рекламация", owner: "CRM / автоматическое действие системы",
+                roles: [
+                    {
+                        name: "Клиент", class: "role-client",
+                        actions: [
+                            { text: "заполняет форму рекламации по ссылке" },
+                            { text: "указывает фирму / компанию" },
+                            { text: "указывает контактное лицо" },
+                            { text: "указывает телефон / email" },
+                            { text: "указывает контакт владельца или ответственного на объекте" },
+                            { text: "указывает адрес объекта" },
+                            { text: "описывает причину проблемы" },
+                            { text: "добавляет описание проблемы по пунктам" },
+                            { text: "загружает фото / видео проблемы" },
+                            { text: "нажимает кнопку «Отправить»" }
+                        ]
+                    },
+                    {
+                        name: "CRM автоматически", class: "role-crm",
+                        actions: [
+                            { text: "создает новую карточку в воронке «Рекламация»" },
+                            { text: "переносит в карточку все данные из формы" },
+                            { text: "добавляет фото / видео клиента" },
+                            { text: "привязывает рекламацию к клиенту / объекту" },
+                            { text: "назначает ответственным Montageleiter" },
+                            { text: "ставит статус «Новая рекламация»" }
+                        ]
+                    }
+                ],
+                checklist: [
+                    { items: [
+                        { text: "Форма рекламации заполнена" },
+                        { text: "Данные клиента внесены" },
+                        { text: "Контакт ответственного на объекте внесен" },
+                        { text: "Адрес объекта внесен" },
+                        { text: "Описание проблемы добавлено" },
+                        { text: "Фото / видео добавлены" },
+                        { text: "Карточка рекламации создана" },
+                        { text: "Ответственный Montageleiter назначен" }
+                    ]}
+                ],
+                criteria: [
+                    "карточка рекламации создана в CRM",
+                    "все данные из формы перенесены",
+                    "ответственным назначен Montageleiter"
+                ],
+                next: "R2. Владелец → Montageleiter."
+            },
+            {
+                id: "R2", title: "Технический анализ рекламации и решение", owner: "Montageleiter",
+                roles: [
+                    {
+                        name: "Montageleiter", class: "role-montageleiter",
+                        actions: [
+                            { text: "анализирует описание проблемы, фото / видео" },
+                            { text: "проверяет историю монтажа по объекту" },
+                            { text: "определяет, какая бригада выполняла первичный монтаж" },
+                            { text: "определяет причину проблемы" },
+                            { text: "определяет, чья ошибка" },
+                            { text: "описывает причинно-следственную связь" },
+                            { text: "определяет способ решения" },
+                            { text: "определяет необходимые материалы" },
+                            { text: "определяет, какая бригада должна выехать" },
+                            { text: "определяет время на исправление" },
+                            { text: "если по фото / видео невозможно определить причину — организует дополнительную диагностику другой бригадой" },
+                            { text: "заполняет технические поля в карточке или добавляет Акт диагностики рекламации" }
+                        ]
+                    }
+                ],
+                checklist: [
+                    { items: [
+                        { text: "Анализ проблемы проведен" },
+                        { text: "Фото / видео проанализированы" },
+                        { text: "История монтажа проверена" },
+                        { text: "Первичная бригада определена" },
+                        { text: "Причина проблемы определена" },
+                        { text: "Чья ошибка определена" },
+                        { text: "Причинно-следственная связь описана" },
+                        { text: "Способ решения определен" },
+                        { text: "Материалы определены" },
+                        { text: "Бригада для исправления определена" },
+                        { text: "Время на исправление определено" },
+                        { text: "При необходимости проведена диагностика другой бригадой" },
+                        { text: "Технические поля заполнены / акт добавлен" }
+                    ]}
+                ],
+                criteria: [
+                    "техническое решение по рекламации сформировано",
+                    "определены причина, чья ошибка, способ решения, материалы, бригада и время"
+                ],
+                next: "R3. Владелец → B2B-менеджер."
+            },
+            {
+                id: "R3", title: "Согласование сроков устранения с клиентом", owner: "B2B-менеджер",
+                roles: [
+                    {
+                        name: "B2B-менеджер", class: "role-b2b",
+                        actions: [
+                            { text: "ознакомляется с информацией, которую подготовил Montageleiter" },
+                            { text: "связывается с клиентом" },
+                            { text: "согласовывает дату выезда" },
+                            { text: "согласовывает срок устранения рекламации" },
+                            { text: "фиксирует договоренности в CRM" },
+                            { text: "передает карточку Montageleiter в выполнение" }
+                        ]
+                    }
+                ],
+                checklist: [
+                    { items: [
+                        { text: "Дата выезда согласована" },
+                        { text: "Срок устранения согласован" },
+                        { text: "Договоренности с клиентом зафиксированы" },
+                        { text: "Карточка передана Montageleiter в выполнение" }
+                    ]}
+                ],
+                criteria: [
+                    "дата и срок устранения согласованы с клиентом"
+                ],
+                next: "R4. Владелец → Montageleiter."
+            },
+            {
+                id: "R4", title: "Выполнение работ по устранению рекламации", owner: "Montageleiter",
+                roles: [
+                    {
+                        name: "Montageleiter", class: "role-montageleiter",
+                        actions: [
+                            { text: "организует бригаду для исправления" },
+                            { text: "передает бригаде задачу" },
+                            { text: "передает способ решения" },
+                            { text: "передает информацию о материалах" },
+                            { text: "контролирует выполнение работ" },
+                            { text: "получает фото / видео после исправления" },
+                            { text: "загружает фото / видео исправленной ошибки в карточку" },
+                            { text: "передает карточку B2B-менеджеру для закрытия" }
+                        ]
+                    }
+                ],
+                checklist: [
+                    { items: [
+                        { text: "Бригада назначена" },
+                        { text: "Задача на исправление передана" },
+                        { text: "Работы выполнены" },
+                        { text: "Фото / видео после исправления получены" },
+                        { text: "Фото / видео загружены в карточку" },
+                        { text: "Карточка передана B2B-менеджеру" }
+                    ]}
+                ],
+                criteria: [
+                    "ошибка исправлена",
+                    "фото / видео исправления загружены в карточку"
+                ],
+                next: "R5. Владелец → B2B-менеджер."
+            },
+            {
+                id: "R5", title: "Уведомление клиента и закрытие рекламации", owner: "B2B-менеджер",
+                roles: [
+                    {
+                        name: "B2B-менеджер", class: "role-b2b",
+                        actions: [
+                            { text: "проверяет фото / видео исправления в карточке" },
+                            { text: "звонит клиенту, который заполнял форму" },
+                            { text: "сообщает, что ошибка исправлена" },
+                            { text: "отправляет клиенту фото / видео с исправлениями" },
+                            { text: "фиксирует коммуникацию в CRM" },
+                            { text: "закрывает карточку рекламации" }
+                        ]
+                    }
+                ],
+                checklist: [
+                    { items: [
+                        { text: "Фото / видео исправления проверены" },
+                        { text: "Клиенту позвонили" },
+                        { text: "Клиент уведомлен об исправлении" },
+                        { text: "Фото / видео отправлены клиенту" },
+                        { text: "Коммуникация зафиксирована в CRM" },
+                        { text: "Карточка рекламации закрыта" }
+                    ]}
+                ],
+                criteria: [
+                    "клиент уведомлен",
+                    "фото / видео отправлены клиенту",
+                    "рекламация закрыта"
+                ],
+                next: "✓ Рекламация закрыта."
+            }
+        ],
+        transition: { text: "РЕКЛАМАЦИЯ → ЗАКРЫТО", show: true }
+    }
+};
+
+function renderFunnel() {
+    const funnelEl = document.getElementById('funnel');
+    funnelEl.innerHTML = '';
+    ['reklamation'].forEach(key => {
+        funnelEl.appendChild(createStageSection(data[key]));
+    });
+}
+
+function createStageSection(stageData) {
+    const section = document.createElement('div');
+    section.className = 'stage-section';
+
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    const title = document.createElement('div');
+    title.className = `section-title ${stageData.sectionClass}`;
+    title.textContent = stageData.title;
+    header.appendChild(title);
+    const subtitle = document.createElement('div');
+    subtitle.className = 'section-subtitle';
+    subtitle.textContent = stageData.subtitle;
+    header.appendChild(subtitle);
+    section.appendChild(header);
+
+    if (stageData.description) {
+        const desc = document.createElement('div');
+        desc.className = 'section-description';
+        desc.textContent = stageData.description;
+        section.appendChild(desc);
+    }
+
+    const flow = document.createElement('div');
+    flow.className = 'stages-flow';
+
+    stageData.stages.forEach((stage, idx) => {
+        flow.appendChild(createStageCard(stage, stageData.cardClass));
+        if (idx < stageData.stages.length - 1) {
+            const arrow = document.createElement('div');
+            arrow.className = 'flow-arrow';
+            arrow.textContent = '→';
+            flow.appendChild(arrow);
+        }
+    });
+
+    if (stageData.transition && stageData.transition.show) {
+        const transition = document.createElement('div');
+        transition.className = 'transition-block';
+        transition.innerHTML = `<span class="transition-text">${stageData.transition.text}</span><span class="transition-icon">⟹</span>`;
+        flow.appendChild(transition);
+    }
+
+    section.appendChild(flow);
+    return section;
+}
+
+function createStageCard(stage, cardClass) {
+    const card = document.createElement('div');
+    card.className = `stage-card ${cardClass}`;
+
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    const id = document.createElement('div');
+    id.className = 'card-id';
+    id.textContent = stage.id;
+    header.appendChild(id);
+    const titleEl = document.createElement('div');
+    titleEl.className = 'card-title';
+    titleEl.textContent = stage.title;
+    header.appendChild(titleEl);
+    card.appendChild(header);
+
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    // Owner
+    const ownerSection = document.createElement('div');
+    ownerSection.className = 'owner-section';
+    const ownerLabel = document.createElement('div');
+    ownerLabel.className = 'owner-label';
+    ownerLabel.textContent = 'Ответственный:';
+    ownerSection.appendChild(ownerLabel);
+    const ownerName = document.createElement('div');
+    ownerName.className = 'owner-name';
+    ownerName.textContent = stage.owner;
+    ownerSection.appendChild(ownerName);
+    body.appendChild(ownerSection);
+
+    // Roles
+    if (stage.roles && stage.roles.length > 0) {
+        stage.roles.forEach(role => {
+            const roleSection = document.createElement('div');
+            roleSection.className = `role-section ${role.class}`;
+
+            const roleTitle = document.createElement('div');
+            roleTitle.className = `role-title ${role.class}`;
+            roleTitle.textContent = role.name + ':';
+            roleSection.appendChild(roleTitle);
+
+            const actionsList = document.createElement('ul');
+            actionsList.className = 'role-actions';
+            role.actions.forEach(action => {
+                const li = document.createElement('li');
+                li.textContent = typeof action === 'string' ? action : action.text;
+                actionsList.appendChild(li);
+            });
+            roleSection.appendChild(actionsList);
+            body.appendChild(roleSection);
+        });
+    }
+
+    // Checklist
+    if (stage.checklist && stage.checklist.length > 0) {
+        const clSection = document.createElement('div');
+        clSection.className = 'checklist-section';
+        const clTitle = document.createElement('div');
+        clTitle.className = 'checklist-title';
+        clTitle.innerHTML = '☑️ CRM Чек-лист:';
+        clSection.appendChild(clTitle);
+
+        stage.checklist.forEach(group => {
+            if (group.label) {
+                const groupLabel = document.createElement('div');
+                groupLabel.className = 'checklist-group-label';
+                groupLabel.textContent = group.label;
+                clSection.appendChild(groupLabel);
+            }
+            const clList = document.createElement('ul');
+            clList.className = 'checklist-list';
+            group.items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = typeof item === 'string' ? item : item.text;
+                clList.appendChild(li);
+            });
+            clSection.appendChild(clList);
+        });
+        body.appendChild(clSection);
+    }
+
+    // Criteria
+    const criteriaSection = document.createElement('div');
+    criteriaSection.className = 'criteria-section';
+    const criteriaTitle = document.createElement('div');
+    criteriaTitle.className = 'criteria-title';
+    criteriaTitle.textContent = 'Критерий завершения:';
+    criteriaSection.appendChild(criteriaTitle);
+    const criteriaList = document.createElement('ul');
+    criteriaList.className = 'criteria-list';
+    stage.criteria.forEach(criterion => {
+        const li = document.createElement('li');
+        li.textContent = criterion;
+        criteriaList.appendChild(li);
+    });
+    criteriaSection.appendChild(criteriaList);
+    body.appendChild(criteriaSection);
+
+    // Comment
+    if (stage.comment) {
+        const commentSection = document.createElement('div');
+        commentSection.className = 'comment-section';
+        const commentTitle = document.createElement('div');
+        commentTitle.className = 'comment-title';
+        commentTitle.innerHTML = '💡 Комментарий:';
+        commentSection.appendChild(commentTitle);
+        const commentText = document.createElement('div');
+        commentText.className = 'comment-text';
+        commentText.textContent = stage.comment;
+        commentSection.appendChild(commentText);
+        body.appendChild(commentSection);
+    }
+
+    // Next
+    const nextSection = document.createElement('div');
+    nextSection.className = 'next-section';
+    nextSection.innerHTML = `<strong>Далее:</strong> ${stage.next}`;
+    body.appendChild(nextSection);
+
+    card.appendChild(body);
+    return card;
+}
+
+renderFunnel();
+</script>
+</body>
+</html>
