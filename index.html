@@ -72,22 +72,21 @@
         .role-actions li { font-size: 0.8em; color: #475569; padding: 3px 0; padding-left: 16px; position: relative; line-height: 1.4; }
         .role-actions li::before { content: '•'; position: absolute; left: 4px; color: #94a3b8; }
 
-        /* Акт диагностики рекламации — раскрывающийся блок-документ */
-        .act-section { margin: 10px 0 12px 0; border: 1px solid #c7d2fe; border-radius: 10px; background: #eef2ff; overflow: hidden; }
-        .act-summary { list-style: none; cursor: pointer; padding: 10px 12px; font-size: 0.82em; font-weight: 700; color: #4338ca; display: flex; align-items: center; gap: 8px; user-select: none; }
+        /* Акт диагностики рекламации — раскрывается кликом по фразе «заполняет Акт диагностики рекламации» */
+        .role-actions li.act-trigger-li { list-style: none; padding: 0; }
+        .role-actions li.act-trigger-li::before { content: none; }
+        .act-inline { margin: 4px 0 2px 0; border: 1px solid #c7d2fe; border-radius: 8px; background: #eef2ff; overflow: hidden; }
+        .act-summary { list-style: none; cursor: pointer; padding: 5px 10px 5px 16px; font-size: 0.8em; font-weight: 600; color: #4338ca; position: relative; user-select: none; line-height: 1.4; }
         .act-summary::-webkit-details-marker { display: none; }
-        .act-summary::after { content: '▼'; margin-left: auto; font-size: 0.8em; transition: transform 0.2s ease; color: #6366f1; }
-        details[open] > .act-summary::after { transform: rotate(180deg); }
-        .act-body { padding: 4px 12px 12px 12px; }
-        .act-field { margin-top: 10px; }
+        .act-summary::before { content: '•'; position: absolute; left: 4px; color: #6366f1; }
+        .act-summary::after { content: ' ▼'; color: #6366f1; font-size: 0.85em; }
+        details.act-inline[open] > .act-summary::after { content: ' ▲'; }
+        .act-body { padding: 2px 12px 10px 12px; }
+        .act-field { margin-top: 9px; }
         .act-field-label { font-size: 0.78em; font-weight: 600; color: #312e81; margin-bottom: 3px; }
         .act-field-list { list-style: none; padding: 0; margin: 0; }
         .act-field-list li { font-size: 0.76em; color: #4b5563; padding: 2px 0 2px 16px; position: relative; line-height: 1.4; }
         .act-field-list li::before { content: '–'; position: absolute; left: 4px; color: #818cf8; }
-
-        /* Комментарий для разработчика */
-        .dev-note { margin: 8px 0 0 0; padding: 8px 10px; background: #f1f5f9; border: 1px dashed #94a3b8; border-radius: 8px; font-size: 0.72em; color: #475569; font-family: 'SF Mono', Consolas, monospace; line-height: 1.4; }
-        .dev-note::before { content: '⚙ для разработчика: '; font-weight: 700; color: #334155; }
 
         .checklist-section { margin-top: 10px; padding: 10px; background: #f0fdf4; border-radius: 8px; border: 1px solid #86efac; }
         .checklist-title { font-size: 0.75em; font-weight: 600; color: #15803d; margin-bottom: 6px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
@@ -226,7 +225,7 @@ const data = {
                         actions: [
                             { text: "анализирует рекламацию" },
                             { text: "если по фото / видео невозможно определить причину и обсчитать материалы и объём работ — организует дополнительную диагностику другой бригадой" },
-                            { text: "заполняет Акт диагностики рекламации" },
+                            { text: "заполняет Акт диагностики рекламации", actTrigger: true },
                             { text: "ставит задачу Инженеру-ассистенту на расчёт материалов" }
                         ]
                     },
@@ -248,7 +247,6 @@ const data = {
                 ],
                 act: {
                     title: "АКТ ДИАГНОСТИКИ РЕКЛАМАЦИИ",
-                    note: "поле должно быть активным. При нажатии открывается форма «Акт диагностики рекламации».",
                     fields: [
                         { label: "Причина проблемы", items: ["краткое описание причины рекламации"] },
                         { label: "Ответственность", items: ["SkyBud", "производитель", "клиент", "спорная"] },
@@ -510,55 +508,49 @@ function createStageCard(stage, cardClass) {
             const actionsList = document.createElement('ul');
             actionsList.className = 'role-actions';
             role.actions.forEach(action => {
-                const li = document.createElement('li');
-                li.textContent = typeof action === 'string' ? action : action.text;
-                actionsList.appendChild(li);
+                const isObj = typeof action !== 'string';
+                const text = isObj ? action.text : action;
+                // Фраза-триггер: клик по ней раскрывает форму «Акт диагностики»
+                if (isObj && action.actTrigger && stage.act) {
+                    const li = document.createElement('li');
+                    li.className = 'act-trigger-li';
+                    const details = document.createElement('details');
+                    details.className = 'act-inline';
+                    const summary = document.createElement('summary');
+                    summary.className = 'act-summary';
+                    summary.textContent = text;
+                    details.appendChild(summary);
+                    const actBody = document.createElement('div');
+                    actBody.className = 'act-body';
+                    stage.act.fields.forEach(field => {
+                        const fieldEl = document.createElement('div');
+                        fieldEl.className = 'act-field';
+                        const fieldLabel = document.createElement('div');
+                        fieldLabel.className = 'act-field-label';
+                        fieldLabel.textContent = field.label;
+                        fieldEl.appendChild(fieldLabel);
+                        const fieldList = document.createElement('ul');
+                        fieldList.className = 'act-field-list';
+                        field.items.forEach(item => {
+                            const fli = document.createElement('li');
+                            fli.textContent = item;
+                            fieldList.appendChild(fli);
+                        });
+                        fieldEl.appendChild(fieldList);
+                        actBody.appendChild(fieldEl);
+                    });
+                    details.appendChild(actBody);
+                    li.appendChild(details);
+                    actionsList.appendChild(li);
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = text;
+                    actionsList.appendChild(li);
+                }
             });
             roleSection.appendChild(actionsList);
             body.appendChild(roleSection);
         });
-    }
-
-    // Акт диагностики (раскрывающийся блок)
-    if (stage.act) {
-        const details = document.createElement('details');
-        details.className = 'act-section';
-
-        const summary = document.createElement('summary');
-        summary.className = 'act-summary';
-        summary.innerHTML = `📋 ${stage.act.title}`;
-        details.appendChild(summary);
-
-        const actBody = document.createElement('div');
-        actBody.className = 'act-body';
-
-        if (stage.act.note) {
-            const note = document.createElement('div');
-            note.className = 'dev-note';
-            note.textContent = stage.act.note;
-            actBody.appendChild(note);
-        }
-
-        stage.act.fields.forEach(field => {
-            const fieldEl = document.createElement('div');
-            fieldEl.className = 'act-field';
-            const fieldLabel = document.createElement('div');
-            fieldLabel.className = 'act-field-label';
-            fieldLabel.textContent = field.label;
-            fieldEl.appendChild(fieldLabel);
-            const fieldList = document.createElement('ul');
-            fieldList.className = 'act-field-list';
-            field.items.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                fieldList.appendChild(li);
-            });
-            fieldEl.appendChild(fieldList);
-            actBody.appendChild(fieldEl);
-        });
-
-        details.appendChild(actBody);
-        body.appendChild(details);
     }
 
     // Checklist
