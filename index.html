@@ -37,7 +37,7 @@
 
         .stages-flow { display: flex; gap: 15px; overflow-x: auto; padding: 15px 5px; align-items: flex-start; }
 
-        .stage-card { background: white; border-radius: 12px; min-width: 320px; max-width: 350px; border: 2px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s ease; flex-shrink: 0; }
+        .stage-card { background: white; border-radius: 12px; min-width: 320px; max-width: 360px; border: 2px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s ease; flex-shrink: 0; }
         .stage-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
         .stage-card.reklamation-card:hover { border-color: #fc4a1a; }
 
@@ -57,16 +57,37 @@
         .role-section.role-montageleiter { border-left-color: #f59e0b; }
         .role-section.role-client { border-left-color: #06b6d4; }
         .role-section.role-crm { border-left-color: #6366f1; }
+        .role-section.role-engineer { border-left-color: #14b8a6; }
+        .role-section.role-accountant { border-left-color: #a855f7; }
 
         .role-title { font-size: 0.8em; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
         .role-title.role-b2b { color: #3b82f6; }
         .role-title.role-montageleiter { color: #f59e0b; }
         .role-title.role-client { color: #06b6d4; }
         .role-title.role-crm { color: #6366f1; }
+        .role-title.role-engineer { color: #14b8a6; }
+        .role-title.role-accountant { color: #a855f7; }
 
         .role-actions { list-style: none; padding: 0; margin: 0; }
         .role-actions li { font-size: 0.8em; color: #475569; padding: 3px 0; padding-left: 16px; position: relative; line-height: 1.4; }
         .role-actions li::before { content: '•'; position: absolute; left: 4px; color: #94a3b8; }
+
+        /* Акт диагностики рекламации — раскрывающийся блок-документ */
+        .act-section { margin: 10px 0 12px 0; border: 1px solid #c7d2fe; border-radius: 10px; background: #eef2ff; overflow: hidden; }
+        .act-summary { list-style: none; cursor: pointer; padding: 10px 12px; font-size: 0.82em; font-weight: 700; color: #4338ca; display: flex; align-items: center; gap: 8px; user-select: none; }
+        .act-summary::-webkit-details-marker { display: none; }
+        .act-summary::after { content: '▼'; margin-left: auto; font-size: 0.8em; transition: transform 0.2s ease; color: #6366f1; }
+        details[open] > .act-summary::after { transform: rotate(180deg); }
+        .act-body { padding: 4px 12px 12px 12px; }
+        .act-field { margin-top: 10px; }
+        .act-field-label { font-size: 0.78em; font-weight: 600; color: #312e81; margin-bottom: 3px; }
+        .act-field-list { list-style: none; padding: 0; margin: 0; }
+        .act-field-list li { font-size: 0.76em; color: #4b5563; padding: 2px 0 2px 16px; position: relative; line-height: 1.4; }
+        .act-field-list li::before { content: '–'; position: absolute; left: 4px; color: #818cf8; }
+
+        /* Комментарий для разработчика */
+        .dev-note { margin: 8px 0 0 0; padding: 8px 10px; background: #f1f5f9; border: 1px dashed #94a3b8; border-radius: 8px; font-size: 0.72em; color: #475569; font-family: 'SF Mono', Consolas, monospace; line-height: 1.4; }
+        .dev-note::before { content: '⚙ для разработчика: '; font-weight: 700; color: #334155; }
 
         .checklist-section { margin-top: 10px; padding: 10px; background: #f0fdf4; border-radius: 8px; border: 1px solid #86efac; }
         .checklist-title { font-size: 0.75em; font-weight: 600; color: #15803d; margin-bottom: 6px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
@@ -101,10 +122,15 @@
         .info-number.total-num { background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .info-label { font-size: 0.85em; color: #64748b; margin-top: 5px; font-weight: 500; }
 
-        .legend { display: flex; gap: 25px; justify-content: center; margin-top: 25px; flex-wrap: wrap; }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.9em; color: #475569; }
-        .legend-color { width: 18px; height: 18px; border-radius: 5px; }
-        .legend-reklamation { background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%); }
+        .legend { display: flex; gap: 20px; justify-content: center; margin-top: 25px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: #475569; }
+        .legend-color { width: 16px; height: 16px; border-radius: 5px; }
+        .legend-client { background: #06b6d4; }
+        .legend-montageleiter { background: #f59e0b; }
+        .legend-b2b { background: #3b82f6; }
+        .legend-crm { background: #6366f1; }
+        .legend-engineer { background: #14b8a6; }
+        .legend-accountant { background: #a855f7; }
 
         @media (max-width: 768px) { h1 { font-size: 1.6em; } .stage-card { min-width: 280px; } }
     </style>
@@ -113,19 +139,24 @@
 <div class="container">
     <h1>🔧 CRM SkyBud: B2B Wärmepumpe Рекламация</h1>
     <p class="subtitle">Eingang → Analyse → Terminvereinbarung → Behebung → Abschluss | Полный цикл обработки рекламации</p>
-    <p class="version">v1.0 — B2B Wärmepumpe Рекламация Funnel Playbook SKYBUD</p>
+    <p class="version">v2.0 — B2B Wärmepumpe Рекламация Funnel Playbook SKYBUD</p>
 
     <div class="funnel-container">
         <div class="funnel" id="funnel"></div>
     </div>
 
     <div class="legend">
-        <div class="legend-item"><div class="legend-color legend-reklamation"></div><span>Рекламация (R) — Warranty Claims / Beschwerdemanagement</span></div>
+        <div class="legend-item"><div class="legend-color legend-client"></div><span>Клиент</span></div>
+        <div class="legend-item"><div class="legend-color legend-crm"></div><span>CRM (автоматически)</span></div>
+        <div class="legend-item"><div class="legend-color legend-montageleiter"></div><span>Montageleiter</span></div>
+        <div class="legend-item"><div class="legend-color legend-engineer"></div><span>Инженер-ассистент</span></div>
+        <div class="legend-item"><div class="legend-color legend-b2b"></div><span>B2B-менеджер</span></div>
+        <div class="legend-item"><div class="legend-color legend-accountant"></div><span>Ассистент бухгалтера</span></div>
     </div>
 
     <div class="info-box">
         <div class="info-item"><div class="info-number rekl-num">5</div><div class="info-label">Этапов РЕКЛАМАЦИЯ (R)</div></div>
-        <div class="info-item"><div class="info-number total-num">5</div><div class="info-label">Всего этапов</div></div>
+        <div class="info-item"><div class="info-number total-num">6</div><div class="info-label">Ролей в процессе</div></div>
     </div>
 </div>
 
@@ -136,7 +167,7 @@ const data = {
         subtitle: "Warranty Claims / Beschwerdemanagement",
         sectionClass: "section-reklamation",
         cardClass: "reklamation-card",
-        description: "Стадия описывает полный цикл обработки рекламации: от получения заявки клиента до устранения проблемы и закрытия карточки.",
+        description: "Стадия описывает полный цикл обработки рекламации: от получения заявки клиента до устранения проблемы, расчёта себестоимости и закрытия карточки.",
         stages: [
             {
                 id: "R1", title: "Новая рекламация", owner: "CRM / автоматическое действие системы",
@@ -162,7 +193,7 @@ const data = {
                             { text: "создает новую карточку в воронке «Рекламация»" },
                             { text: "переносит в карточку все данные из формы" },
                             { text: "добавляет фото / видео клиента" },
-                            { text: "привязывает рекламацию к клиенту / объекту" },
+                            { text: "привязывает рекламацию к объекту" },
                             { text: "назначает ответственным Montageleiter" },
                             { text: "ставит статус «Новая рекламация»" }
                         ]
@@ -193,41 +224,64 @@ const data = {
                     {
                         name: "Montageleiter", class: "role-montageleiter",
                         actions: [
-                            { text: "анализирует описание проблемы, фото / видео" },
-                            { text: "проверяет историю монтажа по объекту" },
-                            { text: "определяет, какая бригада выполняла первичный монтаж" },
-                            { text: "определяет причину проблемы" },
-                            { text: "определяет, чья ошибка" },
-                            { text: "описывает причинно-следственную связь" },
-                            { text: "определяет способ решения" },
-                            { text: "определяет необходимые материалы" },
-                            { text: "определяет, какая бригада должна выехать" },
-                            { text: "определяет время на исправление" },
-                            { text: "если по фото / видео невозможно определить причину — организует дополнительную диагностику другой бригадой" },
-                            { text: "заполняет технические поля в карточке или добавляет Акт диагностики рекламации" }
+                            { text: "анализирует рекламацию" },
+                            { text: "если по фото / видео невозможно определить причину и обсчитать материалы и объём работ — организует дополнительную диагностику другой бригадой" },
+                            { text: "заполняет Акт диагностики рекламации" },
+                            { text: "ставит задачу Инженеру-ассистенту на расчёт материалов" }
+                        ]
+                    },
+                    {
+                        name: "Инженер-ассистент", class: "role-engineer",
+                        actions: [
+                            { text: "рассчитывает стоимость материалов по спецификации Montageleiter" },
+                            { text: "вносит данные в Акт диагностики рекламации" }
+                        ]
+                    },
+                    {
+                        name: "B2B-менеджер", class: "role-b2b",
+                        actions: [
+                            { text: "определяет финансовый тип рекламации" },
+                            { text: "если рекламация не по вине SkyBud — готовит коммерческое предложение / счёт клиенту" },
+                            { text: "если рекламация по вине SkyBud — относит стоимость рекламации в себестоимость объекта с пометкой «Расходы по рекламации»" }
                         ]
                     }
                 ],
+                act: {
+                    title: "АКТ ДИАГНОСТИКИ РЕКЛАМАЦИИ",
+                    note: "поле должно быть активным. При нажатии открывается форма «Акт диагностики рекламации».",
+                    fields: [
+                        { label: "Причина проблемы", items: ["краткое описание причины рекламации"] },
+                        { label: "Ответственность", items: ["SkyBud", "производитель", "клиент", "спорная"] },
+                        { label: "Способ устранения", items: ["краткое описание решения"] },
+                        { label: "Бригада для выполнения работ", items: ["бригада, которая должна выполнить исправление"] },
+                        { label: "Трудозатраты", items: ["количество людей", "трудозатраты в часах", "количество выездов"] },
+                        { label: "Материалы", items: ["спецификация материалов"] },
+                        { label: "Стоимость материалов", items: ["стоимость материалов"] },
+                        { label: "Стоимость рекламации", items: ["стоимость работ", "стоимость материалов", "итого"] },
+                        { label: "Финансовый тип рекламации", items: ["за счёт SkyBud", "за счёт клиента", "за счёт производителя", "решение руководителя"] },
+                        { label: "Заключение Montageleiter", items: ["краткий итоговый вывод по рекламации"] }
+                    ]
+                },
                 checklist: [
                     { items: [
-                        { text: "Анализ проблемы проведен" },
-                        { text: "Фото / видео проанализированы" },
-                        { text: "История монтажа проверена" },
-                        { text: "Первичная бригада определена" },
                         { text: "Причина проблемы определена" },
-                        { text: "Чья ошибка определена" },
-                        { text: "Причинно-следственная связь описана" },
-                        { text: "Способ решения определен" },
-                        { text: "Материалы определены" },
-                        { text: "Бригада для исправления определена" },
-                        { text: "Время на исправление определено" },
-                        { text: "При необходимости проведена диагностика другой бригадой" },
-                        { text: "Технические поля заполнены / акт добавлен" }
+                        { text: "Ответственность определена" },
+                        { text: "Способ устранения определён" },
+                        { text: "Трудозатраты рассчитаны" },
+                        { text: "Акт диагностики заполнен" },
+                        { text: "Спецификация материалов сформирована" },
+                        { text: "Стоимость материалов рассчитана" },
+                        { text: "Стоимость рекламации рассчитана" },
+                        { text: "Финансовый тип рекламации определён" },
+                        { text: "Коммерческое решение принято" }
                     ]}
                 ],
                 criteria: [
                     "техническое решение по рекламации сформировано",
-                    "определены причина, чья ошибка, способ решения, материалы, бригада и время"
+                    "трудозатраты рассчитаны",
+                    "спецификация материалов сформирована",
+                    "стоимость материалов и стоимость рекламации рассчитаны",
+                    "финансовое решение по рекламации принято"
                 ],
                 next: "R3. Владелец → B2B-менеджер."
             },
@@ -237,8 +291,10 @@ const data = {
                     {
                         name: "B2B-менеджер", class: "role-b2b",
                         actions: [
+                            { text: "переименовывает сделку, добавляя пометку «R»" },
                             { text: "ознакомляется с информацией, которую подготовил Montageleiter" },
-                            { text: "связывается с клиентом" },
+                            { text: "если рекламация не по вине SkyBud — связывается с клиентом и готовит счёт" },
+                            { text: "если рекламация по вине SkyBud — фиксирует стоимость затрат по рекламации" },
                             { text: "согласовывает дату выезда" },
                             { text: "согласовывает срок устранения рекламации" },
                             { text: "фиксирует договоренности в CRM" },
@@ -265,13 +321,26 @@ const data = {
                     {
                         name: "Montageleiter", class: "role-montageleiter",
                         actions: [
+                            { text: "при необходимости пересогласовывает дату выполнения работ с клиентом" },
                             { text: "организует бригаду для исправления" },
                             { text: "передает бригаде задачу" },
+                            { text: "добавляет ответственного исполнителя в группу объекта" },
                             { text: "передает способ решения" },
                             { text: "передает информацию о материалах" },
                             { text: "контролирует выполнение работ" },
+                            { text: "фиксирует фактические трудозатраты" },
+                            { text: "фиксирует фактический километраж" },
                             { text: "получает фото / видео после исправления" },
                             { text: "загружает фото / видео исправленной ошибки в карточку" },
+                            { text: "передает карточку Ассистенту бухгалтера для расчёта себестоимости рекламации" }
+                        ]
+                    },
+                    {
+                        name: "Ассистент бухгалтера", class: "role-accountant",
+                        actions: [
+                            { text: "рассчитывает фактическую себестоимость рекламации" },
+                            { text: "учитывает стоимость материалов, труда и амортизацию автомобиля / километраж" },
+                            { text: "вносит расчёт себестоимости в карточку" },
                             { text: "передает карточку B2B-менеджеру для закрытия" }
                         ]
                     }
@@ -280,15 +349,22 @@ const data = {
                     { items: [
                         { text: "Бригада назначена" },
                         { text: "Задача на исправление передана" },
+                        { text: "Ответственный исполнитель добавлен в группу объекта" },
                         { text: "Работы выполнены" },
+                        { text: "Фактические трудозатраты внесены" },
+                        { text: "Фактический километраж внесён" },
                         { text: "Фото / видео после исправления получены" },
                         { text: "Фото / видео загружены в карточку" },
+                        { text: "Себестоимость рекламации рассчитана" },
+                        { text: "Расчёт себестоимости внесён в карточку" },
                         { text: "Карточка передана B2B-менеджеру" }
                     ]}
                 ],
                 criteria: [
                     "ошибка исправлена",
-                    "фото / видео исправления загружены в карточку"
+                    "фото / видео исправления загружены в карточку",
+                    "фактические затраты внесены",
+                    "себестоимость рекламации рассчитана"
                 ],
                 next: "R5. Владелец → B2B-менеджер."
             },
@@ -298,10 +374,12 @@ const data = {
                     {
                         name: "B2B-менеджер", class: "role-b2b",
                         actions: [
-                            { text: "проверяет фото / видео исправления в карточке" },
-                            { text: "звонит клиенту, который заполнял форму" },
-                            { text: "сообщает, что ошибка исправлена" },
-                            { text: "отправляет клиенту фото / видео с исправлениями" },
+                            { text: "проверяет расчёт себестоимости рекламации" },
+                            { text: "если рекламация по вине SkyBud — относит стоимость рекламации в себестоимость объекта" },
+                            { text: "если рекламация не по вине SkyBud — связывается с клиентом" },
+                            { text: "уведомляет клиента о выполнении работ" },
+                            { text: "выставляет счёт клиенту" },
+                            { text: "контролирует получение оплаты" },
                             { text: "фиксирует коммуникацию в CRM" },
                             { text: "закрывает карточку рекламации" }
                         ]
@@ -309,17 +387,19 @@ const data = {
                 ],
                 checklist: [
                     { items: [
-                        { text: "Фото / видео исправления проверены" },
+                        { text: "Стоимость рекламации отнесена в себестоимость объекта или выставлен счёт клиенту" },
                         { text: "Клиенту позвонили" },
                         { text: "Клиент уведомлен об исправлении" },
                         { text: "Фото / видео отправлены клиенту" },
+                        { text: "Оплата получена (если рекламация платная)" },
                         { text: "Коммуникация зафиксирована в CRM" },
                         { text: "Карточка рекламации закрыта" }
                     ]}
                 ],
                 criteria: [
                     "клиент уведомлен",
-                    "фото / видео отправлены клиенту",
+                    "стоимость рекламации отнесена в себестоимость объекта или оплачена клиентом",
+                    "Оплата получена (если рекламация платная)",
                     "рекламация закрыта"
                 ],
                 next: "✓ Рекламация закрыта."
@@ -437,6 +517,48 @@ function createStageCard(stage, cardClass) {
             roleSection.appendChild(actionsList);
             body.appendChild(roleSection);
         });
+    }
+
+    // Акт диагностики (раскрывающийся блок)
+    if (stage.act) {
+        const details = document.createElement('details');
+        details.className = 'act-section';
+
+        const summary = document.createElement('summary');
+        summary.className = 'act-summary';
+        summary.innerHTML = `📋 ${stage.act.title}`;
+        details.appendChild(summary);
+
+        const actBody = document.createElement('div');
+        actBody.className = 'act-body';
+
+        if (stage.act.note) {
+            const note = document.createElement('div');
+            note.className = 'dev-note';
+            note.textContent = stage.act.note;
+            actBody.appendChild(note);
+        }
+
+        stage.act.fields.forEach(field => {
+            const fieldEl = document.createElement('div');
+            fieldEl.className = 'act-field';
+            const fieldLabel = document.createElement('div');
+            fieldLabel.className = 'act-field-label';
+            fieldLabel.textContent = field.label;
+            fieldEl.appendChild(fieldLabel);
+            const fieldList = document.createElement('ul');
+            fieldList.className = 'act-field-list';
+            field.items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                fieldList.appendChild(li);
+            });
+            fieldEl.appendChild(fieldList);
+            actBody.appendChild(fieldEl);
+        });
+
+        details.appendChild(actBody);
+        body.appendChild(details);
     }
 
     // Checklist
